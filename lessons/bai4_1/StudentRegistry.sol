@@ -8,6 +8,8 @@ contract StudentRegistry {
         bool isRegistered;
     }
 
+    event StudentRegistered (address indexed user, string name, uint age);
+
     mapping (address => Student) students;
 
     function register(string memory _name, uint _age) public {
@@ -15,15 +17,13 @@ contract StudentRegistry {
         student.name = _name;
         student.age = _age;
         student.isRegistered = true;
+
+        emit StudentRegistered(msg.sender, _name, _age);
     }
 
     function getStudent(address user) public view returns(string memory, uint, bool) {
         Student storage currentStudent = students[user];
-
-        // Revert if isRegistered = false
-        if (!currentStudent.isRegistered) {
-            revert();
-        }
+        require(currentStudent.isRegistered, "Student is not registered");
 
         return (currentStudent.name, currentStudent.age, currentStudent.isRegistered);
     }
